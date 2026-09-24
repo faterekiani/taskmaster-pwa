@@ -29,7 +29,35 @@
 }
 
 :root {
-  /* تم پایه پیش‌فرض: دارک زغالی و سبز زمردی */
+  --background: #f8fafc;
+  --foreground: #0f172a;
+
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+
+  --primary: #10b981;
+  --primary-foreground: #ffffff;
+
+  --secondary: #f1f5f9;
+  --secondary-foreground: #0f172a;
+
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+
+  --accent: #e2e8f0;
+  --accent-foreground: #0f172a;
+
+  --destructive: #ef4444;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #10b981;
+  --radius: 0.75rem;
+}
+
+.dark {
   --background: #09090b;
   --foreground: #f4f4f5;
 
@@ -39,7 +67,6 @@
   --popover: #18181b;
   --popover-foreground: #f4f4f5;
 
-  /* رنگ سبز امرالد آیکون */
   --primary: #10b981;
   --primary-foreground: #09090b;
 
@@ -56,7 +83,6 @@
   --border: #27272a;
   --input: #27272a;
   --ring: #10b981;
-  --radius: 0.75rem;
 }
 
 @layer base {
@@ -64,7 +90,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground transition-colors duration-200;
   }
   html {
     @apply font-sans;

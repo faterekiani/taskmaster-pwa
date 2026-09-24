@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { CheckCircle2, Moon, Sun } from "lucide-react";
 import { DragDropContext, Droppable, type DropResult } from "@hello-pangea/dnd";
 import { TaskForm } from "@/components/TaskForm";
 import { TaskItem } from "@/components/TaskItem";
@@ -15,6 +16,22 @@ import {
 
 export default function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [isDark, setIsDark] = useState<boolean>(() => {
+    const saved = localStorage.getItem("theme");
+    if (saved) return saved === "dark";
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  });
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (isDark) {
+      root.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      root.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  }, [isDark]);
 
   useEffect(() => {
     getTasksFromDB()
@@ -63,18 +80,37 @@ export default function App() {
   const completedCount = tasks.filter((t) => t.completed).length;
 
   return (
-    <main className="min-h-screen bg-background text-foreground p-4 sm:p-8 flex justify-center items-start">
-      <Card className="w-full max-w-md shadow-2xl border-border bg-card mt-6 sm:mt-12">
+    <main className="min-h-screen bg-background text-foreground p-4 sm:p-8 flex justify-center items-start transition-colors duration-200">
+      <Card className="w-full max-w-md shadow-xl border-border bg-card mt-6 sm:mt-12 transition-colors duration-200">
         <CardHeader className="pb-3 border-b border-border/50 flex flex-row items-center justify-between">
           <CardTitle className="flex items-center gap-2.5 text-xl font-bold tracking-tight">
             <CheckCircle2 className="w-6 h-6 text-primary" />
             TaskMaster PWA
           </CardTitle>
-          {tasks.length > 0 && (
-            <span className="text-xs text-muted-foreground bg-secondary px-2.5 py-1 rounded-full font-medium">
-              {completedCount} of {tasks.length} done
-            </span>
-          )}
+
+          <div className="flex items-center gap-2">
+            {tasks.length > 0 && (
+              <span className="text-xs text-muted-foreground bg-secondary px-2.5 py-1 rounded-full font-medium">
+                {completedCount} of {tasks.length} done
+              </span>
+            )}
+
+            {/* دکمه سوییچ تم */}
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsDark((prev) => !prev)}
+              aria-label="Toggle theme"
+              className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+            >
+              {isDark ? (
+                <Sun className="w-4 h-4 text-amber-400" />
+              ) : (
+                <Moon className="w-4 h-4 text-slate-700" />
+              )}
+            </Button>
+          </div>
         </CardHeader>
 
         <CardContent className="space-y-4 pt-4">
