@@ -11,41 +11,49 @@ interface TaskDB extends DBSchema {
   tasks: {
     key: string;
     value: Task;
-    indexes: { "by-date": number };
   };
 }
 
 const DB_NAME = "taskmaster-pwa-db";
-const DB_VERSION = 1;
+const DB_VERSION = 3;
 
 export const initDB = async () => {
   return openDB<TaskDB>(DB_NAME, DB_VERSION, {
     upgrade(db) {
-      if (!db.objectStoreNames.contains("tasks")) {
-        const store = db.createObjectStore("tasks", { keyPath: "id" });
-        store.createIndex("by-date", "createdAt");
+      if (db.objectStoreNames.contains("tasks")) {
+        db.deleteObjectStore("tasks");
       }
+      db.createObjectStore("tasks", { keyPath: "id" });
     },
   });
 };
 
 export const getTasksFromDB = async (): Promise<Task[]> => {
   const db = await initDB();
-  const tasks = await db.getAllFromIndex("tasks", "by-date");
-  return tasks.reverse();
+  return db.getAll("tasks");
 };
 
-export const addTaskToDB = async (task: Task) => {
+export const addTaskToDB = async (task: Task): Promise<void> => {
   const db = await initDB();
   await db.put("tasks", task);
 };
 
-export const updateTaskInDB = async (task: Task) => {
+export const updateTaskInDB = async (task: Task): Promise<void> => {
   const db = await initDB();
   await db.put("tasks", task);
 };
 
-export const deleteTaskFromDB = async (id: string) => {
+export const deleteTaskFromDB = async (id: string): Promise<void> => {
   const db = await initDB();
   await db.delete("tasks", id);
+};
+
+export const saveAllTasksToDB = async (tasks: Task[]): Promise<void> => {
+  const db = await initDB();
+  const tx = db.transaction("tasks", "readwrite");
+  await tx.store.clear();
+  for (const task of tasks) {
+    await tx.store.put(task);
+  }
+  await tx.done;
 };
